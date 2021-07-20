@@ -4,6 +4,22 @@ const NodeTransServer = require('../../node_trans_server');
 function postStreamTrans(req, res, next) {
   let config = req.body;
   if (
+    config.stream &&
+    config.app &&
+    !config.hls &&
+    !config.hlsFlags &&
+    !config.dash &&
+    !config.dashFlags
+  ) {
+    let streamServer = new NodeStreamServer(config)
+    console.log(req.body)
+    if (streamServer) {
+      res.json({ message: 'OK Success' })
+    } else {
+      res.status(404)
+      res.json({ message: 'Failed creating stream' })
+    }
+  } else if (
     config.app &&
     config.hls &&
     config.ac &&

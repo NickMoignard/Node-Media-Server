@@ -1,0 +1,29 @@
+{
+    "compilerOptions": {
+      "target": "es2015",
+      "module": "esnext",
+      "lib": [
+        "es6",
+        "dom",
+        "es2015"
+      ],
+      "outDir": "dist",
+      "rootDir": "src",
+      "strict": true,
+      "noImplicitAny": false,
+      "esModuleInterop": true,
+      "resolveJsonModule": true,
+      "forceConsistentCasingInFileNames": true,
+      "allowJs": true,
+      "skipLibCheck": true,
+      "allowSyntheticDefaultImports": true,
+      "noFallthroughCasesInSwitch": true,
+      "moduleResolution": "node",
+      "isolatedModules": true,
+      "noEmit": true
+    },
+    "include": [
+      "src"
+    ]
+  }
+  
