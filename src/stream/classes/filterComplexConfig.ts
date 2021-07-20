@@ -32,7 +32,7 @@ class FilterComplexConfig {
         
         let ffOuts = '',
             ffScales = ''
-    
+
         for (var i = 1; i < vers.length + 2; i++) {
             const last = () => vers.length + 2 === i
             const first = () => i === 1
