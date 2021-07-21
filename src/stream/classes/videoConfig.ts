@@ -1,8 +1,8 @@
 import { VideoBitrate, CodecParams, ArgvArray } from "."
 
 class VideoConfig {
-    w: number
-    h: number
+    w?: number
+    h?: number
     audio_codec: string
     audio_bitrate: string
     // find out if this is actually audio channels
@@ -14,12 +14,13 @@ class VideoConfig {
     g: number // -g 48
     sc_threshold: number // -sc_threshold 0
     keyint_min: number// -keyint_min 48
+    original: boolean
 
     constructor(
-      w: number,
-      h: number,
-      ab: string,
-      vb: VideoBitrate,
+      w?: number,
+      h?: number,
+      ab: string = "256k",
+      vb: VideoBitrate = new VideoBitrate("10M", "10M","10M","20M"),
       aChannels: number = 2,
       ac: string = "aac",
       vc: string = "libx264",
@@ -27,10 +28,14 @@ class VideoConfig {
       preset: string = "slow",
       g: number = 48,
       sc_threshold: number = 0,
-      keyint_min: number = 48
+      keyint_min: number = 48,
+      original: boolean = false
     ) {
-        this.w = w
-        this.h = h
+        if (w && h) {
+            this.w = w
+            this.h = h
+        }
+        this.original = original
         this.audio_codec = ac
         this.audio_bitrate = ab
         this.video_codec = vc
@@ -44,24 +49,10 @@ class VideoConfig {
     }
 
     vidOutputArgs = (index: number): Array<string> => {
-        // return ~= [
-        //   '[v1out]',
-        //     '-c:v:0', 'libx264',
-        //     '-x264-params', '"nal-hrd=cbr:force-cfr=1"',
-        //     '-b:v:0', '5M',
-        //     '-maxrate:v:0', '5M',
-        //     '-minrate:v:0', '5M',
-        //     '-bufsize:v:0', '10M',
-        //     '-preset', 'slow',
-        //     '-g', '48',
-        //     '-sc_threshold', '0',
-        //     '-keyint_min', '48'
-        // ]
-        const argv = new ArgvArray(["-map", `[v${index}out]`])
-
-        argv.add([`-c:v:${index - 1}`, this.video_codec])
+        const argv = new ArgvArray(["-map", `[v${index + 1}out]`])
+        argv.add([`-c:v:${index}`, this.video_codec])
         argv.add(this.codecParams.forExec())
-        argv.add(this.video_bitrate.forExec(index - 1))
+        argv.add(this.video_bitrate.forExec())
         argv.add(["-preset", this.preset])
         argv.add(["-g", `${this.g}`])
         argv.add(["-sc_threshold", `${this.sc_threshold}`])
@@ -70,11 +61,11 @@ class VideoConfig {
         return argv.list
     }
     aOutputArgs = (index: number): Array<string> => {
-        // returns ~= [ 'a:0', '-c:a:0', 'aac', '-b:a:0', '96k', '-ac', '2']
-        const argv = new ArgvArray([`a:${index}`])
+        const argv = new ArgvArray(['a:0'])
         argv.add([`-c:a:${index}`, this.audio_codec])
         argv.add([`-b:a:${index}`, this.audio_bitrate])
         argv.add(["-ac", `${this.audio_channels}`])
+
         return argv.list
     }
 }

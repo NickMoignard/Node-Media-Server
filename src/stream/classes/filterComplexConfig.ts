@@ -7,9 +7,9 @@ class FilterComplexConfig {
     constructor(vers?: Array<VideoConfig>) {
         if (!vers) {
             this.#versions = [
-                new VideoConfig(1920, 1080,"256k", new VideoBitrate("5M", "5M", "5M", "10M")),
-                new VideoConfig(1280, 720,"96k", new VideoBitrate("3M", "3M", "3M", "3M")),
-                new VideoConfig(640, 360,"48k", new VideoBitrate("1M", "1M", "1M", "1M"))
+                new VideoConfig(),
+                new VideoConfig(-1, 720,"96k", new VideoBitrate("3M", "3M", "3M", "3M")),
+                new VideoConfig(-1, 360,"48k", new VideoBitrate("1M", "1M", "1M", "1M"))
             ]
         } else {
             if (vers.length > 0) {
@@ -33,20 +33,17 @@ class FilterComplexConfig {
         let ffOuts = '',
             ffScales = ''
 
-        for (var i = 1; i < vers.length + 2; i++) {
-            const last = () => vers.length + 2 === i
-            const first = () => i === 1
-            const semi = last() ? '' : ';' 
-    
+        for (var i = 1; i < vers.length + 1; i++) {
             ffOuts += `[v${i}]`
-            if (first()) {
-                ffScales += `[v1]copy[v1out]${semi} `
+            if (i === 1) {
+                ffScales += `[v1]copy[v1out];`
             } else {
-                let conf = vers[i - 2]
-                ffScales += `[v${i}]scale=w=${conf.w}:h=${conf.h}[v${i}out]${semi} `
+                let conf = vers[i - 1]
+                ffScales += ` [v${i}]scale=w=${conf.w}:h=${conf.h}[v${i}out];`
             }
         }
-        return ["-filter_complex", `[0:v]split=${vers.length + 1}${ffOuts}; ${ffScales}`]
+        
+        return ["-filter_complex", `"[0:v]split=${vers.length}${ffOuts}; ${ffScales.slice(0, ffScales.length - 1)}"`]
     }
 }
 

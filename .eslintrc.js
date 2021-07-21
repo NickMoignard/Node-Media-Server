@@ -1,14 +1,28 @@
 module.exports = {
-  'env': {
+  env: {
     'commonjs': true,
-    'es2020': true,
+    'es2021': true,
     'node': true
   },
-  'parserOptions': {
-    'ecmaVersion': 11
+  extends: [
+    'airbnb',
+    'plugin:prettier/recommended',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:import/errors',
+    'plugin:import/warnings'
+  ],
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    ecmaVersion: 12,
+    sourceType: 'module'
   },
-  'rules': {
-    'indent': [
+  plugins: [
+    '@typescript-eslint',
+    'prettier',
+    'import'
+  ],
+  rules: {
+    indent: [
       'error',
       2,
       {SwitchCase: 1}
@@ -17,11 +31,11 @@ module.exports = {
       'error',
       'unix'
     ],
-    'quotes': [
+    quotes: [
       'error',
       'single'
     ],
-    'semi': [
+    semi: [
       'error',
       'always'
     ]

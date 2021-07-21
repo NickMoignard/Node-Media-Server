@@ -8,7 +8,7 @@
         "es2015"
       ],
       "outDir": "dist",
-      "rootDir": "src",
+      "rootDir": ".",
       "strict": true,
       "noImplicitAny": false,
       "esModuleInterop": true,
@@ -23,7 +23,7 @@
       "noEmit": true
     },
     "include": [
-      "src"
+      "src", "package.json"
     ]
   }
   

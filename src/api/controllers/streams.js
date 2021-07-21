@@ -1,7 +1,8 @@
 const _ = require('lodash');
 const NodeTransServer = require('../../node_trans_server');
+const NodeStreamServer = require('../../stream/server');
 
-function postStreamTrans(req, res, next) {
+export function postStreamTrans(req, res, next) {
   let config = req.body;
   if (
     config.stream &&
@@ -42,7 +43,7 @@ function postStreamTrans(req, res, next) {
   }
 }
 
-function getStreams(req, res, next) {
+export function getStreams(req, res, next) {
   let stats = {};
 
   this.sessions.forEach(function(session, id) {
@@ -126,7 +127,7 @@ function getStreams(req, res, next) {
   res.json(stats);
 }
 
-function getStream(req, res, next) {
+export function getStream(req, res, next) {
   let streamStats = {
     isLive: false,
     viewers: 0,
@@ -160,7 +161,7 @@ function getStream(req, res, next) {
   res.json(streamStats);
 }
 
-function delStream(req, res, next) {
+export function delStream(req, res, next) {
   let publishStreamPath = `/${req.params.app}/${req.params.stream}`;
   let publisherSession = this.sessions.get(
     this.publishers.get(publishStreamPath)
@@ -174,7 +175,3 @@ function delStream(req, res, next) {
   }
 }
 
-exports.delStream = delStream;
-exports.getStreams = getStreams;
-exports.getStream = getStream;
-exports.postStreamTrans = postStreamTrans;

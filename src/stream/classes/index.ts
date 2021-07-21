@@ -11,16 +11,16 @@ export class VideoBitrate {
       this.buffer = buffer
     }
 
-    forExec(index: number) {
+    forExec() {
         // 5M -maxrate:v:0 5M -minrate:v:0 5m -bufsize:v:0 10M
         return [
-            `-b:v:${index}`,
+            `-b:v:0`,
             this.rate,
-            `-maxrate:v:${index}`,
+            `-maxrate:v:0`,
             this.max,
-            `-minrate:v:${index}`,
+            `-minrate:v:0`,
             this.min,
-            `-bufsize:v:${index}`,
+            `-bufsize:v:0`,
             this.buffer
         ]
     }
@@ -41,8 +41,8 @@ export class CodecParams {
 
 export class ArgvArray {
     #list: Array<string>
-    constructor(list: Array<string>) {
-        this.#list = list
+    constructor(list?: Array<string>) {
+        this.#list = list ? list : []
     }
     get list() {
         return this.#list.map(n => n)
