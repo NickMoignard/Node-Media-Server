@@ -1,4 +1,4 @@
-import { VideoBitrate } from "."
+import VideoBitrate from "./VideoBitrate"
 import VideoConfig from "./videoConfig"
 
 class FilterComplexConfig {

@@ -1,4 +1,6 @@
-import { VideoBitrate, CodecParams, ArgvArray } from "."
+import ArgvArray from "./ArgvArray"
+import CodecParams from "./CodecParams"
+import VideoBitrate from "./VideoBitrate"
 
 class VideoConfig {
     w: number

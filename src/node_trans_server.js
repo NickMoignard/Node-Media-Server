@@ -11,6 +11,7 @@ const { getFFmpegVersion, getFFmpegUrl } = require('./node_core_utils');
 const fs = require('fs');
 const _ = require('lodash');
 const mkdirp = require('mkdirp');
+const ws = require('ws');
 
 class NodeTransServer {
   constructor(config) {
@@ -50,6 +51,10 @@ class NodeTransServer {
     context.nodeEvent.on('postPublish', this.onPostPublish.bind(this));
     context.nodeEvent.on('donePublish', this.onDonePublish.bind(this));
     Logger.log(`Node Media Trans Server started for apps: [ ${apps}] , MediaRoot: ${this.config.http.mediaroot}, ffmpeg version: ${version}`);
+    this.wsServer.on('connection', function(ws, req) {
+      Logger.log('Node Media Trans Server: WebSocket Client Connected.');
+      this.wsServer.send({ type: 0, msg: 'Media Server Transmuxer Diagnostics Connected' });
+    });
   }
 
   onPostPublish(id, streamPath, args) {
@@ -68,7 +73,14 @@ class NodeTransServer {
       if (app === conf.app) {
         let session = new NodeTransSession(conf);
         this.transSessions.set(id, session);
+        session.on('data', millisecondsElapsed => {
+          this.emit('ffdata' ,{ type: 1, millisecondsElapsed });
+        });
+        session.on('error', (err) => {
+          this.emit('fferror', { type: 2, err});
+        });
         session.on('end', () => {
+          this.emit('ffend')
           this.transSessions.delete(id);
         });
         session.run();

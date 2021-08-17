@@ -5,7 +5,6 @@
 //
 
 const OS = require('os');
-const Package = require('../../../package.json');
 function cpuAverage() {
 
   //Initialise sum of idle and time of cores and fetch CPU info
@@ -106,8 +105,7 @@ function getInfo(req, res, next) {
         rtmp: sinfo.rtmp,
         http: sinfo.http,
         ws: sinfo.ws
-      },
-      version: Package.version
+      }
     };
     res.json(info);
   });

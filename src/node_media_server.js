@@ -12,7 +12,7 @@ const NodeTransServer = require('./node_trans_server');
 const NodeRelayServer = require('./node_relay_server');
 const NodeFissionServer = require('./node_fission_server');
 const context = require('./node_core_ctx');
-const Package = require('../package.json');
+
 
 class NodeMediaServer {
   constructor(config) {
@@ -21,7 +21,6 @@ class NodeMediaServer {
 
   run() {
     Logger.setLogType(this.config.logType);
-    Logger.log(`Node Media Server v${Package.version}`);
     if (this.config.rtmp) {
       this.nrs = new NodeRtmpServer(this.config);
       this.nrs.run();
@@ -38,6 +37,15 @@ class NodeMediaServer {
       } else {
         this.nts = new NodeTransServer(this.config);
         this.nts.run();
+        this.nts.on('ffdata', (data) => {
+          Logger.log('ffData');
+        });
+        this.nts.on('fferror', (data) => {
+          Logger.log('ffError');
+        });
+        this.nts.on('ffend', (data) => {
+          Logger.log('ffEnd');
+        });
       }
     }
 
@@ -65,26 +73,6 @@ class NodeMediaServer {
 
     process.on('SIGINT', function() {
       process.exit();
-    });
-
-    Https.get('https://registry.npmjs.org/node-media-server', function (res) {
-      let size = 0;
-      let chunks = [];
-      res.on('data', function (chunk) {
-        size += chunk.length;
-        chunks.push(chunk);
-      });
-      res.on('end', function () {
-        let data = Buffer.concat(chunks, size);
-        let jsonData = JSON.parse(data.toString());
-        let latestVersion = jsonData['dist-tags']['latest'];
-        let latestVersionNum = latestVersion.split('.')[0] << 16 | latestVersion.split('.')[1] << 8 | latestVersion.split('.')[2] & 0xff;
-        let thisVersionNum = Package.version.split('.')[0] << 16 | Package.version.split('.')[1] << 8 | Package.version.split('.')[2] & 0xff;
-        if (thisVersionNum < latestVersionNum) {
-          Logger.log(`There is a new version ${latestVersion} that can be updated`);
-        }
-      });
-    }).on('error', function (e) {
     });
   }
 

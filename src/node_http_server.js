@@ -69,6 +69,55 @@ class NodeHttpServer {
     if (config.http.webroot) {
       app.use(Express.static(config.http.webroot));
     }
+    
+    /**   MIDDLEWARE
+    /*    when cls+ requests HLS for a live stream being transmuxed. the HLS EXT-ENDLIST tag will not be present.
+    /*    below we are intercepting request to live videos and creating a new HLS manifest for each request.
+    /*    This allows the user to treat the video as a VOD.
+    /*
+    /*    Introducing one hinderance, polling.
+    /*    clients will need to request a new manifest if they are to watch new content added after initial request
+    */
+    // app.get('/live/*', (req, res, next) => {
+    //   const matchID = req.path.split('/')[2]
+    //   if (matchID) {
+    //       fs.open(`${mediaRoot}/live/${matchID}/index.m3u8`, 'a+', (_err, fd) => {
+    //         try {
+    //           fs.readFile(fd, (_err, data) => {
+                
+    //             fs.writeFile(`${mediaRoot}/live/${matchID}/vod.m3u8`, data,'utf-8', () => {
+                  
+    //               if (data.toString('utf-8').includes('#EXT-X-ENDLIST')) {
+    //                 fs.close(fd, err => {
+    //                   if (err) throw err
+    //                 })
+    //                 next()
+    //               }
+    //               // hls manifest does not contain endlist tag
+    //               fs.appendFile(`${mediaRoot}/live/${matchID}/vod.m3u8`, '#EXT-X-ENDLIST', err => {
+    //                 if (err) {
+    //                   console.log(err)
+    //                 } else {
+    //                   console.log('Endlist tag added to file')
+    //                 }
+    //                 fs.close(fd, err => {
+    //                   if (err) { throw err } else {
+    //                     next()
+    //                   }
+    //                 })
+    //               })
+    //             })
+    //           })
+    //         } catch (err) {
+    //           fs.close(fd, err => {
+    //             if (err) throw err
+    //             next()
+    //           })
+    //         }
+    //       })
+
+    //   }
+    // }, Express.static(mediaRoot))
 
     this.httpServer = Http.createServer(app);
 
