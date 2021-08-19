@@ -1,11 +1,15 @@
 import WebSocket from "ws"
-
-import BaseWSFFSession from "./classes/BaseStreamSession"
-import ArgvArray from "./classes/ArgvArray"
+import ArgvArray from "../helpers/classes/ArgvArray"
 
 import { StreamConf } from "../types"
 import { CLIENT_ACTIONS } from "../types/enums"
-class NodeStreamSession extends BaseWSFFSession {
+import BaseWebSocketSession from "./BaseWebSocketSession"
+
+/**
+ * Event emitting websocket stream session
+ * @extends BaseWebSocketSession
+ */
+class WebSocketSession extends BaseWebSocketSession {
   conf: StreamConf
   argv: ArgvArray
   
@@ -13,7 +17,6 @@ class NodeStreamSession extends BaseWSFFSession {
     super(id, ws)
     this.conf = conf
     this.argv = this.wsToHLSFfArgs(`${this.conf.mediaroot}/${this.conf.streamApp}/${this.conf.streamName}`)
-    
   }
 
   // Class Methods
@@ -88,16 +91,18 @@ class NodeStreamSession extends BaseWSFFSession {
     // argv.add(['-f', 'flv', rtmpUrl])
       
     // hls
-    // argv.add(["-f", "hls"])
-    // argv.add(["-hls_time", "2"])
-    // argv.add(["-hls_flags", "independant_segments"])
-    // argv.add(["-hls_segment_type", "mpegts"])
-    // argv.add(["-hls_list_size", "6900"])
-    // argv.add(["-hls_segment_filename", "stream_%v/data%02d.ts"])
-    // argv.add(["-master_pl_name", "master.m3u8"])
-    // argv.add(["-var_stream_map", '"v:0,a:0 v:1,a:1 v:2,a:2" stream_%v.m3u8'])
+    argv.add(["-f", "hls"])
+    argv.add(["-hls_time", "2"])
+    argv.add(["-hls_flags", "independant_segments"])
+    argv.add(["-hls_segment_type", "mpegts"])
+
+    // Investigate
+    argv.add(["-hls_list_size", "6900"])
+    argv.add(["-hls_segment_filename", "stream_%v/data%02d.ts"])
+    argv.add(["-master_pl_name", "master.m3u8"])
+    argv.add(["-var_stream_map", '"v:0,a:0 v:1,a:1 v:2,a:2" stream_%v.m3u8'])
     return argv
   }
 }
 
-export default NodeStreamSession
+export default WebSocketSession

@@ -11,7 +11,7 @@ const NodeHttpServer = require('./node_http_server');
 const NodeTransServer = require('./node_trans_server');
 const NodeRelayServer = require('./node_relay_server');
 const NodeFissionServer = require('./node_fission_server');
-const NodeStreamServer = require('./stream/server')
+const NodeStreamServer = require('./websocket/Server')
 const context = require('./node_core_ctx');
 
 

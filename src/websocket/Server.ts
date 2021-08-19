@@ -1,33 +1,44 @@
 import Logger from "../node_core_logger"
-import NodeStreamSession from "./session";
+import WebSocketSession from "./Session"
 import { getFFmpegVersion, getFFmpegUrl } from "../node_core_utils"
 import context from "../node_core_ctx"
 import fs from "fs"
 import * as _ from "lodash"
 import mkdirp from "mkdirp"
 import EventEmitter from "events"
-import { WS_CODES as codes } from "./Codes"
 import WebSocket from "ws"
 import url from "url"
 import NodeCoreUtils from "../node_core_utils"
 import http from "http"
 import { NodeMediaServerConfig, StreamConf } from "../types";
+import { HLS_CODES } from "../types/enums"
 
 type SessionObjects = {
   websocket: WebSocket,
-  session: NodeStreamSession
+  session: WebSocketSession
 }
-class NodeStreamServer extends EventEmitter {
+
+
+/**
+ * Event emitting websocket stream server
+ * @extends EventEmitter
+ */
+class WebSocketStreamServer extends EventEmitter {
   config: NodeMediaServerConfig 
   streamSessions: Map<string, SessionObjects>
-  ws: WebSocket.Server
+  wsServer: WebSocket.Server
 
+  /**
+   * Create a websocket stream server
+   * @param config 
+   * @returns 
+   */
   constructor(config) {
     super()
     if (!config.stream) throw new Error('Incorrect Stream Config')
     this.config = config
     this.streamSessions = new Map()
-    this.ws = new WebSocket.Server({ port: 8080 })
+    this.wsServer = new WebSocket.Server({ port: 8080 })
 
     // Check media root directory
     try {
@@ -62,7 +73,7 @@ class NodeStreamServer extends EventEmitter {
       ['headers', this.headers],
       ['close', this.close]
     ])
-    Object.keys(serverEventsMap).forEach(key => this.ws.on(key, serverEventsMap[key]))
+    Object.keys(serverEventsMap).forEach(key => this.wsServer.on(key, serverEventsMap[key]))
   }
 
   connection(ws: WebSocket, req: http.IncomingMessage) {
@@ -92,7 +103,7 @@ class NodeStreamServer extends EventEmitter {
 
     if (app === conf.app) {
       const id = streamPath;
-      let session = new NodeStreamSession(conf, id, ws);
+      let session = new WebSocketSession(conf, id, ws);
       this.streamSessions.set(id, {
         session: session,
         websocket: ws
@@ -100,13 +111,13 @@ class NodeStreamServer extends EventEmitter {
       
       const sessionEventsMap = new Map<string, Function>([
         ['data', (millisecondsElapsed) => {
-          this.emit(codes.hls.data.toString(), millisecondsElapsed)
+          this.emit(HLS_CODES.data.toString(), millisecondsElapsed)
         }],
         ['error', (err) => {
-          this.emit(`${codes.hls.error}`)
+          this.emit(`${HLS_CODES.error}`)
         }],
         ['end', (id) => {
-          this.emit(`${codes.hls.finished}`)
+          this.emit(`${HLS_CODES.finished}`)
           this.streamSessions.delete(id)
         }]
       ])
@@ -123,11 +134,11 @@ class NodeStreamServer extends EventEmitter {
     // nothing atm
   }
   close() {
-    this.streamSessions.forEach(session => session.end())
+    this.streamSessions.forEach(session => session.session.stopFfmpeg)
   }
   listening() {
-    Logger.log(`WebSocket Server listening at: ${this.ws.address()}`)
+    Logger.log(`WebSocket Server listening at: ${this.wsServer.address()}`)
   }
 }
 
-export default NodeStreamServer
+export default WebSocketStreamServer
