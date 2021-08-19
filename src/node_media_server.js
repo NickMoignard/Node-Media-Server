@@ -11,6 +11,7 @@ const NodeHttpServer = require('./node_http_server');
 const NodeTransServer = require('./node_trans_server');
 const NodeRelayServer = require('./node_relay_server');
 const NodeFissionServer = require('./node_fission_server');
+const NodeStreamServer = require('./stream/server')
 const context = require('./node_core_ctx');
 
 
@@ -31,6 +32,19 @@ class NodeMediaServer {
       this.nhs.run();
     }
 
+    if (this.config.stream) {
+      this.nss = new NodeStreamServer(this.config);
+      this.nss.on(codes.hls.data.toString(), timeElapsed => {
+        // TODO
+      })
+      this.nss.on(codes.hls.error.toString(), err => {
+        // TODO
+      })
+      this.nss.on(codes.hls.finished.toString(), id => {
+        // TODO
+      })
+    }
+    
     if (this.config.trans) {
       if (this.config.cluster) {
         Logger.log('NodeTransServer does not work in cluster mode');
@@ -92,6 +106,9 @@ class NodeMediaServer {
     }
     if (this.nfs) {
       this.nfs.stop();
+    }
+    if (this.nss) {
+      this.nss.stop();
     }
   }
 
