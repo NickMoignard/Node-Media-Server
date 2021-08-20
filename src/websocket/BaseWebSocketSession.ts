@@ -13,11 +13,13 @@ import FfmpegProcess from "../FfmpegProcess"
  */
 class BaseWebSocketSession extends FfmpegProcess {
     ws: WebSocket
+    start: Date
 
     constructor(id: string, ws: WebSocket) {
         super(id)
         this.ws = ws
         this.addWebSocketEventListners()
+        this.start = new Date()
     }
 
     addWebSocketEventListners(){
@@ -39,8 +41,10 @@ class BaseWebSocketSession extends FfmpegProcess {
         })
       }
     websocketMessageEventHandler(_data: Buffer | ArrayBuffer | Buffer[] | string, _isBinary: boolean) {
+      this.emit('data', new Date().valueOf() - this.start.valueOf())
     }
-    websocketErrorEventHandler(_error: Error) {
+    websocketErrorEventHandler(error: Error) {
+      this.emit('error', error)
     }
     websocketClosedEventHandler(_code: number, _reason: Buffer) {
     }

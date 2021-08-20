@@ -54,13 +54,15 @@ class WebSocketStreamServer extends EventEmitter {
     }
 
     // add event listeners
-    const serverEventsMap = new Map<string, Function>([
+    const serverEventsMap = new Map<string, (...args: any[]) => void>([
       ['connection', this.connection],
       ['error', this.error],
       ['headers', this.headers],
       ['close', this.close]
     ])
-    Object.keys(serverEventsMap).forEach(key => this.wsServer.on(key, serverEventsMap[key]))
+    Object.keys(serverEventsMap).forEach(key =>
+       this.wsServer.on(key, serverEventsMap.get(key) as (...args: any[]) => void)
+    )
   }
 
   connection(ws: WebSocket, req: http.IncomingMessage) {
@@ -93,19 +95,21 @@ class WebSocketStreamServer extends EventEmitter {
       let session = new WebSocketSession(conf, id, ws)
       this.streamSessions.set(id, session)
       
-      const sessionEventsMap = new Map<string, Function>([
-        ['data', (millisecondsElapsed) => {
+      const sessionEventsMap = new Map<string, (...args: any[]) => void>([
+        ['data', (millisecondsElapsed: number) => {
           this.emit(HLS_CODES.data.toString(), millisecondsElapsed)
         }],
-        ['error', (err) => {
+        ['error', (err: Error) => {
           this.emit(`${HLS_CODES.error}`)
         }],
-        ['end', (id) => {
+        ['end', (id: string) => {
           this.emit(`${HLS_CODES.finished}`)
           this.streamSessions.delete(id)
         }]
       ])
-      Object.keys(sessionEventsMap).forEach(key => session.on(key, sessionEventsMap[key]))
+      Object.keys(sessionEventsMap).forEach(
+        key => session.on(key, sessionEventsMap.get(key) as (...args: any[]) => void)
+      )
 
       session.run()
     }
@@ -118,7 +122,10 @@ class WebSocketStreamServer extends EventEmitter {
     // nothing atm
   }
   close() {
-    Object.keys(this.streamSessions).forEach(key => this.streamSessions[key].stopFfmpeg())
+    Object.keys(this.streamSessions).forEach(key => {
+      const session = this.streamSessions.get(key)
+      session && session.stopFfmpeg()
+    })
   }
   listening() {
     Logger.log(`WebSocket Server listening at: ${this.wsServer.address()}`)
