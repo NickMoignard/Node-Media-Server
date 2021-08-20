@@ -7,7 +7,7 @@ export class VideoBitrate {
     min: string
     buffer: string
 
-    constructor(rate, max, min, buffer) {
+    constructor(rate: string, max: string, min: string, buffer: string) {
       this.rate = rate
       this.max = max
       this.min = min

@@ -99,7 +99,7 @@ class WebSocketStreamServer extends EventEmitter {
         ['data', (millisecondsElapsed: number) => {
           this.emit(HLS_CODES.data.toString(), millisecondsElapsed)
         }],
-        ['error', (err: Error) => {
+        ['error', (_err: Error) => {
           this.emit(`${HLS_CODES.error}`)
         }],
         ['end', (id: string) => {
@@ -118,7 +118,7 @@ class WebSocketStreamServer extends EventEmitter {
   error(error: Error) {
     Logger.error(`Web Socket Server Error Event: ${error.message}`)
   }
-  headers(headers: Array<any>, req: http.IncomingMessage) {
+  headers(_headers: Array<any>, _req: http.IncomingMessage) {
     // nothing atm
   }
   close() {
