@@ -1,15 +1,15 @@
-import { ChildProcess, spawn } from "child_process"
-import EventEmitter from "events"
+// import { ChildProcess, spawn } from "child_process"
+// import EventEmitter from "events"
 import WebSocket from "ws"
-import Logger from '../node_core_logger'
-import { StreamConf } from "../types"
-import { CLIENT_ACTIONS } from "../types/enums"
+// import Logger from '../node_core_logger'
+// import { StreamConf } from "../types"
+// import { CLIENT_ACTIONS } from "../types/enums"
 import FfmpegProcess from "../FfmpegProcess"
 
 
 /**
  * Ffmpeg Session with a websocket connection as input
- * @extends EventEmitter
+ * @extends FfmpegProcess
  */
 class BaseWebSocketSession extends FfmpegProcess {
     ws: WebSocket
@@ -22,7 +22,7 @@ class BaseWebSocketSession extends FfmpegProcess {
 
     addWebSocketEventListners(){
         // EVENT LISTENERS
-        const websocketEventsMap = new Map<string, Function>([
+        const websocketEventsMap = new Map<string, (...args: any[]) => void>([
           ['close', this.websocketClosedEventHandler],
           ['error', this.websocketErrorEventHandler],
           ['message', this.websocketMessageEventHandler],
@@ -32,13 +32,17 @@ class BaseWebSocketSession extends FfmpegProcess {
           ['unexpected-response', this.websocketUnExpResEventHandler],
           ['upgrade', this.websocketUpgradeEventHandler],
         ])
-        Object.keys(websocketEventsMap).forEach(key => this.ws.on(key, websocketEventsMap[key]))
+        
+        Object.keys(websocketEventsMap).forEach(key => { 
+          const func = websocketEventsMap.get(key) as (...args: any[]) => void
+          this.ws.on(key, func)
+        })
       }
-    websocketMessageEventHandler(data: Buffer | ArrayBuffer | Buffer[] | string, isBinary: boolean) {
+    websocketMessageEventHandler(_data: Buffer | ArrayBuffer | Buffer[] | string, _isBinary: boolean) {
     }
-    websocketErrorEventHandler(error: Error) {
+    websocketErrorEventHandler(_error: Error) {
     }
-    websocketClosedEventHandler(code: number, reason: Buffer) {
+    websocketClosedEventHandler(_code: number, _reason: Buffer) {
     }
     websocketOpenEventHandler() {
     }

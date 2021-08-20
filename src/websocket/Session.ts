@@ -67,14 +67,19 @@ class WebSocketSession extends BaseWebSocketSession {
     super.websocketClosedEventHandler(code, reason)
     this.stopFfmpeg()
   }
+  // ffmpegCloseEventHandler(code) {
+  //   super.ffmpegCloseEventHandler(code)
+    // ws.terminate()
+  // }
 
   // Private
-  wsToHLSFfArgs(outpath: string) {
+  wsToHLSFfArgs(_outpath: string) {
     let argv = new ArgvArray(['-y']) // Overwrite output files without asking.
           
     // no input path. we will manually add data to ffmpeg process
     argv.add(['-i', '-'])
   
+    // note mpeg hls output
     // video codec config: low latency, adaptive bitrate
     argv.add(['-c:v', 'libx264', '-preset', 'veryfast', '-tune', 'zerolatency'])
   
@@ -98,6 +103,7 @@ class WebSocketSession extends BaseWebSocketSession {
 
     // Investigate
     argv.add(["-hls_list_size", "6900"])
+
     argv.add(["-hls_segment_filename", "stream_%v/data%02d.ts"])
     argv.add(["-master_pl_name", "master.m3u8"])
     argv.add(["-var_stream_map", '"v:0,a:0 v:1,a:1 v:2,a:2" stream_%v.m3u8'])

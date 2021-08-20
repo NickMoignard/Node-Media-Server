@@ -1,23 +1,17 @@
 import Logger from "../node_core_logger"
 import WebSocketSession from "./Session"
-import { getFFmpegVersion, getFFmpegUrl } from "../node_core_utils"
-import context from "../node_core_ctx"
+// import { getFFmpegVersion, getFFmpegUrl } from "../node_core_utils"
+// import context from "../node_core_ctx"
 import fs from "fs"
 import * as _ from "lodash"
 import mkdirp from "mkdirp"
 import EventEmitter from "events"
 import WebSocket from "ws"
 import url from "url"
-import NodeCoreUtils from "../node_core_utils"
+// import NodeCoreUtils from "../node_core_utils"
 import http from "http"
 import { NodeMediaServerConfig, StreamConf } from "../types";
 import { HLS_CODES } from "../types/enums"
-
-type SessionObjects = {
-  websocket: WebSocket,
-  session: WebSocketSession
-}
-
 
 /**
  * Event emitting websocket stream server
@@ -25,15 +19,17 @@ type SessionObjects = {
  */
 class WebSocketStreamServer extends EventEmitter {
   config: NodeMediaServerConfig 
-  streamSessions: Map<string, SessionObjects>
+  streamSessions: Map<string, WebSocketSession>
   wsServer: WebSocket.Server
+
+// TODO: - add authentication to publish routes
 
   /**
    * Create a websocket stream server
-   * @param config 
+   * @param {NodeMediaServerConfig} config - The configuration for server setup
    * @returns 
    */
-  constructor(config) {
+  constructor(config: NodeMediaServerConfig) {
     super()
     if (!config.stream) throw new Error('Incorrect Stream Config')
     this.config = config
@@ -45,26 +41,17 @@ class WebSocketStreamServer extends EventEmitter {
       mkdirp.sync(config.stream.mediaroot);
       fs.accessSync(config.stream.mediaroot, fs.constants.W_OK);
     } catch (error) {
-      Logger.error(`Node Media Stream Server startup failed. MediaRoot:${config.stream.mediaroot} cannot be written.`);
-      return;
+      Logger.error(`Node Media Stream Server startup failed. MediaRoot:${config.stream.mediaroot} cannot be written.`)
+      return
     }
 
     // Check for ffmpeg
     try {
-      fs.accessSync(config.stream.ffmpeg, fs.constants.X_OK);
+      fs.accessSync(config.stream.ffmpeg, fs.constants.X_OK)
     } catch (error) {
-      Logger.error(`Node Media Stream Server startup failed. ffmpeg:${config.stream.ffmpeg} cannot be executed.`);
-      return;
+      Logger.error(`Node Media Stream Server startup failed. ffmpeg:${config.stream.ffmpeg} cannot be executed.`)
+      return
     }
-
-    // Log to console the media server tasks started
-    let i = config.stream.tasks.length;
-    let apps = '';
-    while (i--) {
-      apps += config.stream.tasks[i].app;
-      apps += ' ';
-    }
-    Logger.log(`Node Media Stream Server started for apps: [ ${apps}] , MediaRoot: ${config.http.mediaroot}`);
 
     // add event listeners
     const serverEventsMap = new Map<string, Function>([
@@ -102,12 +89,9 @@ class WebSocketStreamServer extends EventEmitter {
     } as StreamConf
 
     if (app === conf.app) {
-      const id = streamPath;
-      let session = new WebSocketSession(conf, id, ws);
-      this.streamSessions.set(id, {
-        session: session,
-        websocket: ws
-      });
+      const id = streamPath
+      let session = new WebSocketSession(conf, id, ws)
+      this.streamSessions.set(id, session)
       
       const sessionEventsMap = new Map<string, Function>([
         ['data', (millisecondsElapsed) => {
@@ -134,7 +118,7 @@ class WebSocketStreamServer extends EventEmitter {
     // nothing atm
   }
   close() {
-    this.streamSessions.forEach(session => session.session.stopFfmpeg)
+    Object.keys(this.streamSessions).forEach(key => this.streamSessions[key].stopFfmpeg())
   }
   listening() {
     Logger.log(`WebSocket Server listening at: ${this.wsServer.address()}`)

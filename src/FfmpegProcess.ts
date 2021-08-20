@@ -1,8 +1,8 @@
 import { ChildProcess, spawn } from "child_process"
 import EventEmitter from "events"
 import Logger from './node_core_logger'
-import { StreamConf } from "./types"
-import { CLIENT_ACTIONS } from "./types/enums"
+// import { StreamConf } from "./types"
+// import { CLIENT_ACTIONS } from "./types/enums"
 
 class FfmpegProcess extends EventEmitter {
     ffmpeg_exec?: ChildProcess
@@ -12,7 +12,7 @@ class FfmpegProcess extends EventEmitter {
         super()
         this.id = id
     }
-    run(ffmpegPath: string, argvList: string[], path: string) {
+    run(ffmpegPath: string, argvList: string[], _path: string) {
         this.ffmpeg_exec = spawn(ffmpegPath, argvList)
         this.addFfmpegEventListners()
     }
@@ -27,25 +27,28 @@ class FfmpegProcess extends EventEmitter {
               this.ffmpeg_exec.stderr.on('data', this.ffmpegSTDOUTErrorEventHandler)
       
           // FFMPEG child process events
-          const ffmpegEventsMap = new Map<string, Function>([
+          const ffmpegEventsMap = new Map<string, (...args: any[]) => void>([
             ['close',this.ffmpegCloseEventHandler],
             ['error', this.ffmpegErrorEventHandler],
           ])
-          Object.keys(ffmpegEventsMap).forEach(key => this.ffmpeg_exec && this.ffmpeg_exec.on(key, ffmpegEventsMap[key]))
+          Object.keys(ffmpegEventsMap).forEach(key => {
+            const func = ffmpegEventsMap.get(key)
+            func && this.ffmpeg_exec && this.ffmpeg_exec.on(key, func)
+          })
         }
       }
-      ffmpegErrorEventHandler(e) {
+      ffmpegErrorEventHandler(e: Error) {
           Logger.ffdebug(e)
       }
-      ffmpegCloseEventHandler(code) {
+      ffmpegCloseEventHandler(_code: number, _signal: string) {
           Logger.log('[Transmuxing end] ' + this.path)
           this.emit('end', this.id)
       }
-      ffmpegSTDOUTErrorEventHandler(data) {
-          Logger.ffdebug(`FFerr：${data}`)
+      ffmpegSTDOUTErrorEventHandler(error: Error) {
+          Logger.ffdebug(`FFerr：${error}`)
       }
-      ffmpegDataEventHandler(data) {
-          Logger.ffdebug(`FFout: ${data}`)
+      ffmpegDataEventHandler(chunk: Buffer | string | any) {
+          Logger.ffdebug(`FFout: ${chunk}`)
       }
       stopFfmpeg() {
         this.ffmpeg_exec && this.ffmpeg_exec.kill('SIGSTOP') // or "SIGINT" for keyboard interupt
