@@ -149,20 +149,6 @@ class NodeHttpServer {
       Logger.log('Node Media Http Server Close.');
     });
 
-    this.wsServer = new WebSocket.Server({ server: this.httpServer });
-
-    this.wsServer.on('connection', (ws, req) => {
-      req.nmsConnectionType = 'ws';
-      this.onConnect(req, ws);
-    });
-
-    this.wsServer.on('listening', () => {
-      Logger.log(`Node Media WebSocket Server started on port: ${this.port}`);
-    });
-    this.wsServer.on('error', (e) => {
-      Logger.error(`Node Media WebSocket Server ${e}`);
-    });
-
     if (this.httpsServer) {
       this.httpsServer.listen(this.sport, () => {
         Logger.log(`Node Media Https Server started on port: ${this.sport}`);
