@@ -76,4 +76,8 @@ export interface NodeMediaServerConfig {
     https?: HTTPSConf
     stream?: StreamConf
     trans?: TransConf
+    logType?: number
+    fission?: any
+    cluster?: any
+    relay?: any
 }

@@ -109,18 +109,18 @@ export class VideoConfig {
 }
 
 export class FilterComplexConfig {
-    #versions: Array<VideoConfig>
+    _versions: Array<VideoConfig>
 
     constructor(vers?: Array<VideoConfig>) {
         if (!vers) {
-            this.#versions = [
+            this._versions = [
                 new VideoConfig(1920, 1080,"256k", new VideoBitrate("5M", "5M", "5M", "10M")),
                 new VideoConfig(1280, 720,"96k", new VideoBitrate("3M", "3M", "3M", "3M")),
                 new VideoConfig(640, 360,"48k", new VideoBitrate("1M", "1M", "1M", "1M"))
             ]
         } else {
             if (vers.length > 0) {
-                this.#versions =  vers
+                this._versions =  vers
             } else {
                 throw new Error("A filter complex requires at least one version")
             }
@@ -128,10 +128,10 @@ export class FilterComplexConfig {
     }
 
     get versions(): Array<VideoConfig> {
-        return this.#versions
+        return this._versions
     }
     set versions(vers: Array<VideoConfig>) {
-        this.#versions = vers
+        this._versions = vers
     }
     filterComplexArgs = (): Array<string> => {
         // returns ~= "[0:v]split=3[v1][v2][v3]; [v1]copy[v1out]; [v2]scale=w=1280:h=720[v2out]; [v3]scale=w=640:h=360[v3out]"

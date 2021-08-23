@@ -1,16 +1,16 @@
 class ArgvArray {
-    #list: Array<string>
+    _list: Array<string>
     constructor(list: Array<string>) {
-        this.#list = list
+        this._list = list
     }
     get list() {
-        return this.#list.map(n => n)
+        return this._list.map(n => n)
     }
     set list(list: Array<string>) {
-        this.#list = list
+        this._list = list
     }
     add(list: Array<string>) {
-        Array.prototype.push.apply(this.#list, list)
+        Array.prototype.push.apply(this._list, list)
     }
 }
 

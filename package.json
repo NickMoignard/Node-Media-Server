@@ -3,11 +3,10 @@
   "version": "2.3.8",
   "description": "A Node.js implementation of RTMP Server",
   "bin": "bin/app.js",
-  "main": "src/node_media_server.js",
+  "main": "./src/node_media_server.js",
   "scripts": {
     "start": "node bin/app.js"
   },
-  "module": "",
   "repository": "git+https://github.com/NickMoignard/Node-Media-Server.git",
   "keywords": [
     "rtmp",

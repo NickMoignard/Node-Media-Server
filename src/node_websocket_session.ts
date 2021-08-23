@@ -1,9 +1,9 @@
 import WebSocket from "ws"
-import ArgvArray from "../helpers/classes/ArgvArray"
+import ArgvArray from "./helpers/classes/ArgvArray"
 
-import { StreamConf } from "../types"
-import { CLIENT_ACTIONS } from "../types/enums"
-import BaseWebSocketSession from "./BaseWebSocketSession"
+import { StreamConf } from "./types"
+import { CLIENT_ACTIONS } from "./types/enums"
+import BaseWebSocketSession from "./base_node_websocket_server"
 
 /**
  * Event emitting websocket stream session
@@ -110,5 +110,5 @@ class WebSocketSession extends BaseWebSocketSession {
     return argv
   }
 }
-
+module.exports = WebSocketSession
 export default WebSocketSession

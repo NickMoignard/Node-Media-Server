@@ -10,44 +10,44 @@ const LOG_TYPES = {
 
 let logType = LOG_TYPES.NORMAL;
 
-const setLogType = (type) => {
-  if (typeof type !== 'number') return;
-
+export const setLogType = (type: number) => {
   logType = type;
 };
 
-const logTime = () => {
+export const logTime = () => {
   let nowDate = new Date();
   return nowDate.toLocaleDateString() + ' ' + nowDate.toLocaleTimeString([], { hour12: false });
 };
 
-const log = (...args) => {
+export const log = (...args: any[]) => {
   if (logType < LOG_TYPES.NORMAL) return;
 
   console.log(logTime(), process.pid, chalk.bold.green('[INFO]'), ...args);
 };
 
-const error = (...args) => {
+export const error = (...args: any[]) => {
   if (logType < LOG_TYPES.ERROR) return;
 
   console.log(logTime(), process.pid, chalk.bold.red('[ERROR]'), ...args);
 };
 
-const debug = (...args) => {
+export const debug = (...args: any[]) => {
   if (logType < LOG_TYPES.DEBUG) return;
 
   console.log(logTime(), process.pid, chalk.bold.blue('[DEBUG]'), ...args);
 };
 
-const ffdebug = (...args) => {
+export const ffdebug = (...args: any[]) => {
   if (logType < LOG_TYPES.FFDEBUG) return;
 
   console.log(logTime(), process.pid, chalk.bold.blue('[FFDEBUG]'), ...args);
 };
 
-module.exports = {
-  LOG_TYPES,
-  setLogType,
-
-  log, error, debug, ffdebug
-};
+export default {
+  setLogType: setLogType,
+  logTime: logTime,
+  log: log,
+  error: error,
+  debug: debug,
+  ffdebug: ffdebug
+}

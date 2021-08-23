@@ -1,5 +1,5 @@
-import Logger from "../node_core_logger"
-import WebSocketSession from "./Session"
+import Logger from "./node_core_logger"
+import WebSocketSession from "./node_websocket_session"
 // import { getFFmpegVersion, getFFmpegUrl } from "../node_core_utils"
 // import context from "../node_core_ctx"
 import fs from "fs"
@@ -10,8 +10,8 @@ import WebSocket from "ws"
 import url from "url"
 // import NodeCoreUtils from "../node_core_utils"
 import http from "http"
-import { NodeMediaServerConfig, StreamConf } from "../types";
-import { HLS_CODES } from "../types/enums"
+import { NodeMediaServerConfig, StreamConf } from "./types";
+import { HLS_CODES } from "./types/enums"
 
 /**
  * Event emitting websocket stream server
@@ -131,5 +131,5 @@ class WebSocketStreamServer extends EventEmitter {
     Logger.log(`WebSocket Server listening at: ${this.wsServer.address()}`)
   }
 }
-
+module.exports = WebSocketStreamServer
 export default WebSocketStreamServer

@@ -4,7 +4,7 @@ import WebSocket from "ws"
 // import Logger from '../node_core_logger'
 // import { StreamConf } from "../types"
 // import { CLIENT_ACTIONS } from "../types/enums"
-import FfmpegProcess from "../FfmpegProcess"
+import FfmpegProcess from "./FfmpegProcess"
 
 
 /**
@@ -43,8 +43,7 @@ class BaseWebSocketSession extends FfmpegProcess {
     websocketMessageEventHandler(_data: Buffer | ArrayBuffer | Buffer[] | string, _isBinary: boolean) {
       this.emit('data', new Date().valueOf() - this.start.valueOf())
     }
-    websocketErrorEventHandler(error: Error) {
-      this.emit('error', error)
+    websocketErrorEventHandler(_error: Error) {
     }
     websocketClosedEventHandler(_code: number, _reason: Buffer) {
     }

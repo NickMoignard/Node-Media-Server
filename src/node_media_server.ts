@@ -4,19 +4,30 @@
 //  Copyright (c) 2018 Nodemedia. All rights reserved.
 //
 
-const Https = require('https');
-const Logger = require('./node_core_logger');
+import { NodeMediaServerConfig } from "./types";
+import { HLS_CODES } from "./types/enums";
+
+// const Https = require('https');
+const Logger = require('./node_core_logger.js');
 const NodeRtmpServer = require('./node_rtmp_server');
 const NodeHttpServer = require('./node_http_server');
 const NodeTransServer = require('./node_trans_server');
 const NodeRelayServer = require('./node_relay_server');
 const NodeFissionServer = require('./node_fission_server');
-const NodeStreamServer = require('./websocket/Server')
+const NodeStreamServer = require('./node_websocket_server');
 const context = require('./node_core_ctx');
 
 
 class NodeMediaServer {
-  constructor(config) {
+  config: NodeMediaServerConfig
+  nrs: typeof NodeRtmpServer
+  nhs: typeof NodeHttpServer
+  nss: typeof NodeStreamServer
+  nts: typeof NodeTransServer
+  nls: typeof NodeRelayServer
+  nfs: typeof NodeFissionServer
+
+  constructor(config: NodeMediaServerConfig) {
     this.config = config;
   }
 
@@ -34,13 +45,13 @@ class NodeMediaServer {
 
     if (this.config.stream) {
       this.nss = new NodeStreamServer(this.config);
-      this.nss.on(codes.hls.data.toString(), timeElapsed => {
+      this.nss.on(HLS_CODES.data.toString(), (_timeElapsed: number) => {
         // TODO
       })
-      this.nss.on(codes.hls.error.toString(), err => {
+      this.nss.on(HLS_CODES.error.toString(), (_err: Error) => {
         // TODO
       })
-      this.nss.on(codes.hls.finished.toString(), id => {
+      this.nss.on(HLS_CODES.finished.toString(), (_id: string) => {
         // TODO
       })
     }
@@ -51,13 +62,13 @@ class NodeMediaServer {
       } else {
         this.nts = new NodeTransServer(this.config);
         this.nts.run();
-        this.nts.on('ffdata', (data) => {
+        this.nts.on('ffdata', (_data: any) => {
           Logger.log('ffData');
         });
-        this.nts.on('fferror', (data) => {
+        this.nts.on('fferror', (_data: any) => {
           Logger.log('ffError');
         });
-        this.nts.on('ffend', (data) => {
+        this.nts.on('ffend', (_data: any) => {
           Logger.log('ffEnd');
         });
       }
@@ -90,7 +101,7 @@ class NodeMediaServer {
     });
   }
 
-  on(eventName, listener) {
+  on(eventName: string, listener: Function) {
     context.nodeEvent.on(eventName, listener);
   }
 
@@ -112,9 +123,10 @@ class NodeMediaServer {
     }
   }
 
-  getSession(id) {
+  getSession(id: string) {
     return context.sessions.get(id);
   }
 }
 
 module.exports = NodeMediaServer;
+export default NodeMediaServer
