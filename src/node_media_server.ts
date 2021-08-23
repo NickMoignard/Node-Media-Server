@@ -45,6 +45,9 @@ class NodeMediaServer {
 
     if (this.config.stream) {
       this.nss = new NodeStreamServer(this.config);
+      if (!this.nss) {
+        Logger.log('Node Stream Server could not start')
+      }
       this.nss.on(HLS_CODES.data.toString(), (_timeElapsed: number) => {
         // TODO
       })
