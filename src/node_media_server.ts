@@ -14,7 +14,7 @@ const NodeHttpServer = require('./node_http_server');
 const NodeTransServer = require('./node_trans_server');
 const NodeRelayServer = require('./node_relay_server');
 const NodeFissionServer = require('./node_fission_server');
-const NodeStreamServer = require('./node_websocket_server');
+const WebSocketStreamServer = require('./node_websocket_server');
 const context = require('./node_core_ctx');
 
 
@@ -22,7 +22,7 @@ class NodeMediaServer {
   config: NodeMediaServerConfig
   nrs: typeof NodeRtmpServer
   nhs: typeof NodeHttpServer
-  nss: typeof NodeStreamServer
+  nss: typeof WebSocketStreamServer
   nts: typeof NodeTransServer
   nls: typeof NodeRelayServer
   nfs: typeof NodeFissionServer
@@ -44,7 +44,7 @@ class NodeMediaServer {
     }
 
     if (this.config.stream) {
-      this.nss = new NodeStreamServer(this.config);
+      this.nss = new WebSocketStreamServer(this.config);
       if (!this.nss) {
         Logger.log('Node Stream Server could not start')
       }

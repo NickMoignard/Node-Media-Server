@@ -12,7 +12,8 @@ import url from "url"
 import http from "http"
 import { NodeMediaServerConfig, StreamConf } from "./types";
 import { HLS_CODES } from "./types/enums"
-
+import { LoggingEnabled } from "@aws-sdk/client-s3"
+const context = require('./node_core_ctx')
 /**
  * Event emitting websocket stream server
  * @extends EventEmitter
@@ -31,6 +32,7 @@ class WebSocketStreamServer extends EventEmitter {
    */
   constructor(config: NodeMediaServerConfig) {
     super()
+    Logger.log('Web Socket stream server started listening on 8080')
     if (!config.stream) throw new Error('Incorrect Stream Config')
     this.config = config
     this.streamSessions = new Map()
@@ -53,21 +55,29 @@ class WebSocketStreamServer extends EventEmitter {
       return
     }
 
-    // add event listeners
-    const serverEventsMap = new Map<string, (...args: any[]) => void>([
-      ['connection', this.connection],
-      ['error', this.error],
-      ['headers', this.headers],
-      ['close', this.close]
-    ])
-    Object.keys(serverEventsMap).forEach(key =>
-       this.wsServer.on(key, serverEventsMap.get(key) as (...args: any[]) => void)
-    )
+    // // add event listeners
+    // const serverEventsMap = new Map<string, (...args: any[]) => void>([
+    //   ['connection', this.connection],
+    //   ['error', this.error],
+    //   ['headers', this.headers],
+    //   ['close', this.close]
+    // ])
+    // Object.keys(serverEventsMap).forEach(key =>
+    //    this.wsServer.on(key, serverEventsMap.get(key) as (...args: any[]) => void)
+    // )
+    this.connection = this.connection.bind(this)
+    this.error = this.error.bind(this)
+    this.headers = this.headers.bind(this)
+    this.listening = this.listening.bind(this)
+
+    this.wsServer.on('connection', this.connection)
+    this.wsServer.on('error', this.error)
+    this.wsServer.on('headers', this.headers)
+    this.wsServer.on('listening', this.listening)
   }
 
   connection(ws: WebSocket, req: http.IncomingMessage) {
     if (!req.url) return
-
     const streamPath = url.parse(req.url).pathname
     
     if (!streamPath) {
@@ -75,12 +85,13 @@ class WebSocketStreamServer extends EventEmitter {
       return
     }
     
-    let [app, name] = streamPath.split('/')
+    let [_, app, name] = streamPath.split('/')
 
     if (!this.config.stream?.ffmpeg || !this.config.stream?.mediaroot) { 
       throw new Error(`Couldn't record stream. Check mediaroot and ffmpeg path`)
     }
-    
+    if (!this.config) throw new Error('Config not set!')
+
     let conf = {
       ...this.config.stream,
       ffmpeg: this.config.stream?.ffmpeg,
@@ -96,23 +107,33 @@ class WebSocketStreamServer extends EventEmitter {
       this.streamSessions.set(id, session)
       
       const sessionEventsMap = new Map<string, (...args: any[]) => void>([
-        ['data', (millisecondsElapsed: number) => {
-          this.emit(HLS_CODES.data.toString(), millisecondsElapsed)
-        }],
-        ['error', (_err: Error) => {
-          this.emit(`${HLS_CODES.error}`)
-        }],
-        ['end', (id: string) => {
-          this.emit(`${HLS_CODES.finished}`)
-          this.streamSessions.delete(id)
-        }]
+        ['data', this.sessionData],
+        ['error', this.sessionError],
+        ['end', this.sessionEnd]
       ])
+
+      this.sessionData = this.sessionData.bind(this)
+      this.sessionError = this.sessionError.bind(this)
+      this.sessionEnd = this.sessionEnd.bind(this)
+
       Object.keys(sessionEventsMap).forEach(
-        key => session.on(key, sessionEventsMap.get(key) as (...args: any[]) => void)
+        key => {
+          session.on(key, sessionEventsMap.get(key) as (...args: any[]) => void)
+        }
       )
 
       session.run()
     }
+  }
+  sessionData(millisecondsElapsed: number) {
+    this.emit(HLS_CODES.data.toString(), millisecondsElapsed)
+  }
+  sessionError(_err: Error) {
+    this.emit(`${HLS_CODES.error}`)
+  }
+  sessionEnd(id: string) {
+    this.emit(`${HLS_CODES.finished}`)
+    this.streamSessions.delete(id)
   }
 
   error(error: Error) {
@@ -128,7 +149,10 @@ class WebSocketStreamServer extends EventEmitter {
     })
   }
   listening() {
-    Logger.log(`WebSocket Server listening at: ${this.wsServer.address()}`)
+    if (this.wsServer) {
+      Logger.log(`WebSocket Server listening at: ${this.wsServer.address()}`)
+    }
+    Logger.log('Websocket Listening Event triggered')
   }
 }
 module.exports = WebSocketStreamServer

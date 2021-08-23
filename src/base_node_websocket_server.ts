@@ -18,28 +18,10 @@ class BaseWebSocketSession extends FfmpegProcess {
     constructor(id: string, ws: WebSocket) {
         super(id)
         this.ws = ws
-        this.addWebSocketEventListners()
+        // this.addWebSocketEventListners()
         this.start = new Date()
     }
 
-    addWebSocketEventListners(){
-        // EVENT LISTENERS
-        const websocketEventsMap = new Map<string, (...args: any[]) => void>([
-          ['close', this.websocketClosedEventHandler],
-          ['error', this.websocketErrorEventHandler],
-          ['message', this.websocketMessageEventHandler],
-          ['open', this.websocketOpenEventHandler],
-          ['ping', this.websocketPingEventHandler],
-          ['pong', this.websocketPongEventHandler],
-          ['unexpected-response', this.websocketUnExpResEventHandler],
-          ['upgrade', this.websocketUpgradeEventHandler],
-        ])
-        
-        Object.keys(websocketEventsMap).forEach(key => { 
-          const func = websocketEventsMap.get(key) as (...args: any[]) => void
-          this.ws.on(key, func)
-        })
-      }
     websocketMessageEventHandler(_data: Buffer | ArrayBuffer | Buffer[] | string, _isBinary: boolean) {
       this.emit('data', new Date().valueOf() - this.start.valueOf())
     }

@@ -3,9 +3,12 @@
   "version": "2.3.8",
   "description": "A Node.js implementation of RTMP Server",
   "bin": "bin/app.js",
-  "main": "./src/node_media_server.js",
+  "main": "./dist/src/node_media_server.js",
   "scripts": {
-    "start": "node bin/app.js"
+    "start": "node dist/test/main.js",
+    "clean": "rd /s /q dist",
+    "build": "tsc -p .",
+    "rerun-test": "yarn clean && yarn build && yarn start"
   },
   "repository": "git+https://github.com/NickMoignard/Node-Media-Server.git",
   "keywords": [
@@ -24,6 +27,8 @@
     "chalk": "^2.4.2",
     "dateformat": "^3.0.3",
     "express": "^4.16.4",
+    "ffmpeg-static": "^4.4.0",
+    "ffprobe-static": "^3.0.0",
     "lodash": ">=4.17.13",
     "minimist": "^1.2.5",
     "mkdirp": "1.0.3",
