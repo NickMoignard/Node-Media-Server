@@ -31,27 +31,22 @@ var FfmpegProcess = /** @class */ (function (_super) {
         return _this;
     }
     FfmpegProcess.prototype.run = function (ffmpegPath, argvList, _path) {
+        node_core_logger_1.default.log(argvList.join(' '));
         this.ffmpeg_exec = child_process_1.spawn(ffmpegPath, argvList);
         this.addFfmpegEventListners();
     };
     FfmpegProcess.prototype.addFfmpegEventListners = function () {
-        var _this = this;
+        this.ffmpegCloseEventHandler = this.ffmpegCloseEventHandler.bind(this);
+        this.ffmpegDataEventHandler = this.ffmpegDataEventHandler.bind(this);
+        this.ffmpegErrorEventHandler = this.ffmpegErrorEventHandler.bind(this);
+        this.ffmpegSTDOUTErrorEventHandler = this.ffmpegSTDOUTErrorEventHandler.bind(this);
         if (this.ffmpeg_exec) {
-            // FFMPEG STDOUT EVENTS
             this.ffmpeg_exec.stdout &&
                 this.ffmpeg_exec.stdout.on('data', this.ffmpegDataEventHandler);
-            // FFMPEG STDERR EVENTS
             this.ffmpeg_exec.stderr &&
                 this.ffmpeg_exec.stderr.on('data', this.ffmpegSTDOUTErrorEventHandler);
-            // FFMPEG child process events
-            var ffmpegEventsMap_1 = new Map([
-                ['close', this.ffmpegCloseEventHandler],
-                ['error', this.ffmpegErrorEventHandler],
-            ]);
-            Object.keys(ffmpegEventsMap_1).forEach(function (key) {
-                var func = ffmpegEventsMap_1.get(key);
-                func && _this.ffmpeg_exec && _this.ffmpeg_exec.on(key, func);
-            });
+            this.ffmpeg_exec.on('close', this.ffmpegCloseEventHandler);
+            this.ffmpeg_exec.on('error', this.ffmpegErrorEventHandler);
         }
     };
     FfmpegProcess.prototype.ffmpegErrorEventHandler = function (e) {

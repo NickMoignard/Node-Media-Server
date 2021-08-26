@@ -3,14 +3,15 @@
 //  illuspas[a]gmail.com
 //  Copyright (c) 2018 Nodemedia. All rights reserved.
 //
-var EventEmitter = require('events');
-var sessions = new Map();
-var publishers = new Map();
-var idlePlayers = new Set();
-var nodeEvent = new EventEmitter();
-var stat = {
-    inbytes: 0,
-    outbytes: 0,
-    accepted: 0
+const EventEmitter = require('events');
+
+let sessions = new Map();
+let publishers = new Map();
+let idlePlayers = new Set();
+let nodeEvent = new EventEmitter();
+let stat = {
+  inbytes: 0,
+  outbytes: 0,
+  accepted: 0
 };
-module.exports = { sessions: sessions, publishers: publishers, idlePlayers: idlePlayers, nodeEvent: nodeEvent, stat: stat };
+module.exports = { sessions, publishers, idlePlayers, nodeEvent, stat };

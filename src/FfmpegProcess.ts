@@ -13,30 +13,27 @@ class FfmpegProcess extends EventEmitter {
         this.id = id
     }
     run(ffmpegPath: string, argvList: string[], _path: string) {
+        Logger.log(argvList.join(' '))
         this.ffmpeg_exec = spawn(ffmpegPath, argvList)
         this.addFfmpegEventListners()
     }
     addFfmpegEventListners() {
-        if (this.ffmpeg_exec) {
-          // FFMPEG STDOUT EVENTS
-          this.ffmpeg_exec.stdout &&
-              this.ffmpeg_exec.stdout.on('data', this.ffmpegDataEventHandler)
-              
-          // FFMPEG STDERR EVENTS
-          this.ffmpeg_exec.stderr &&
-              this.ffmpeg_exec.stderr.on('data', this.ffmpegSTDOUTErrorEventHandler)
-      
-          // FFMPEG child process events
-          const ffmpegEventsMap = new Map<string, (...args: any[]) => void>([
-            ['close',this.ffmpegCloseEventHandler],
-            ['error', this.ffmpegErrorEventHandler],
-          ])
-          Object.keys(ffmpegEventsMap).forEach(key => {
-            const func = ffmpegEventsMap.get(key)
-            func && this.ffmpeg_exec && this.ffmpeg_exec.on(key, func)
-          })
-        }
+      this.ffmpegCloseEventHandler = this.ffmpegCloseEventHandler.bind(this)
+      this.ffmpegDataEventHandler = this.ffmpegDataEventHandler.bind(this)
+      this.ffmpegErrorEventHandler = this.ffmpegErrorEventHandler.bind(this)
+      this.ffmpegSTDOUTErrorEventHandler = this.ffmpegSTDOUTErrorEventHandler.bind(this)
+
+      if (this.ffmpeg_exec) {
+        this.ffmpeg_exec.stdout &&
+          this.ffmpeg_exec.stdout.on('data', this.ffmpegDataEventHandler)
+
+        this.ffmpeg_exec.stderr &&
+          this.ffmpeg_exec.stderr.on('data', this.ffmpegSTDOUTErrorEventHandler)
+          
+        this.ffmpeg_exec.on('close', this.ffmpegCloseEventHandler)
+        this.ffmpeg_exec.on('error', this.ffmpegErrorEventHandler)
       }
+    }
       ffmpegErrorEventHandler(e: Error) {
           Logger.ffdebug(e)
       }

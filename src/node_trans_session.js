@@ -18,7 +18,6 @@ class NodeTransSession extends EventEmitter {
   }
 
   run() {
-    this.startTime = new Date();
     let vc = this.conf.vc || 'copy';
     let ac = this.conf.ac || 'copy';
     let inPath = 'rtmp://127.0.0.1:' + this.conf.rtmpPort + this.conf.streamPath;
@@ -69,12 +68,10 @@ class NodeTransSession extends EventEmitter {
     });
 
     this.ffmpeg_exec.stdout.on('data', (data) => {
-      this.emit('data', new Date().valueOf() - this.startTime.valueOf());
       Logger.ffdebug(`FF输出：${data}`);
     });
 
     this.ffmpeg_exec.stderr.on('data', (data) => {
-      this.emit('error', data);
       Logger.ffdebug(`FF输出：${data}`);
     });
 
@@ -96,9 +93,7 @@ class NodeTransSession extends EventEmitter {
       });
     });
   }
-  processed() {
 
-  }
   end() {
     this.ffmpeg_exec.kill();
   }

@@ -65,6 +65,7 @@ class NodeMediaServer {
       } else {
         this.nts = new NodeTransServer(this.config);
         this.nts.run();
+        debugger;
         this.nts.on('ffdata', (_data: any) => {
           Logger.log('ffData');
         });

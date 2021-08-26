@@ -5,7 +5,7 @@ import { StreamConf } from "./types"
 import { CLIENT_ACTIONS } from "./types/enums"
 import BaseWebSocketSession from "./base_node_websocket_server"
 import fs from "fs"
-import { WSHevcConfig } from "./helpers/classes/wsToHlsFfmpegConf"
+import { rtmpHevcConfig, WStoRTMPcConfig } from "./helpers/classes/wsToHlsFfmpegConf"
 import mkdirp from "mkdirp"
 
 
@@ -14,7 +14,7 @@ import mkdirp from "mkdirp"
  * Event emitting websocket stream session
  * @extends BaseWebSocketSession
  */
-class WebSocketSession extends BaseWebSocketSession {
+class WebSocketRTMPSession extends BaseWebSocketSession {
   conf: StreamConf
   argv: string[] // ArgvArray
   
@@ -22,21 +22,12 @@ class WebSocketSession extends BaseWebSocketSession {
     super(id, ws)
     Logger.log('WebSocketSession constructor')
     this.conf = conf
-    this.argv = new WSHevcConfig(this.conf.streamPath).args()
+    this.argv = new WStoRTMPcConfig(this.conf.streamPath).args()
     this.addWebSocketEventListners()
   }
 
   // Class Methods
   run() {
-    // Check media root directory
-    try {
-      mkdirp.sync(`${this.conf.mediaroot}/${this.conf.streamApp}/${this.conf.streamName}`);
-      fs.accessSync(`${this.conf.mediaroot}/${this.conf.streamApp}/${this.conf.streamName}`, fs.constants.W_OK);
-      Logger.log(`${this.conf.mediaroot}/${this.conf.streamApp}/${this.conf.streamName}`)
-    } catch (error) {
-      Logger.error(`Node Media Stream Server startup failed. MediaRoot:${this.conf.mediaroot}/${this.conf.streamName} cannot be written.`)
-      return
-    }
     this.conf.streamPath && super.run(this.conf.ffmpeg, this.argv , this.conf.streamPath);
     Logger.log('Web Socket Session Started')
   }
@@ -117,5 +108,5 @@ class WebSocketSession extends BaseWebSocketSession {
   }
 }
 
-module.exports = WebSocketSession
-export default WebSocketSession
+module.exports = WebSocketRTMPSession
+export default WebSocketRTMPSession

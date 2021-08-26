@@ -68,16 +68,18 @@ var rtmpToHLS = function (streamPath) {
         //   # add rendition entry in the master playlist
         master_playlist += "#EXT-X-STREAM-INF:BANDWIDTH=" + bandwidth + ",RESOLUTION=" + r.res + "\n" + name + ".m3u8" + "\n";
     });
+    var argArray = (misc_params + " -i " + source + " " + cmd).split(' ');
     // # start conversion
     console.log("Executing command:\nffmpeg " + misc_params + " -i " + source + " " + cmd);
-    var childProcess = cp.spawn(ffmpeg + " " + misc_params + " -i " + source + " " + cmd, function (e, stdout, stderr) {
-        if (e) {
-            console.error("ffmpeg exec error: " + e);
-            return;
-        }
-        console.log("stdout: " + stdout);
-        console.error("stderr: " + stderr);
-    });
+    var childProcess = cp.spawn(ffmpeg, argArray);
+    // (e, stdout, stderr) => {
+    //   if (e) {
+    //     console.error(`ffmpeg exec error: ${e}`)
+    //     return
+    //   }
+    //   console.log(`stdout: ${stdout}`)
+    //   console.error(`stderr: ${stderr}`)
+    // }
     childProcess.stdout.on('data', function (data) {
         console.log(data);
     });
@@ -85,6 +87,5 @@ var rtmpToHLS = function (streamPath) {
     fs.writeFile("" + MEDIA_ROOT + streamPath + "/playlist.m3u8", master_playlist, function () { });
     // echo "Done - encoded HLS is at ${target}/"
     console.log("Done - encoded HLS is at http://localhost:" + (process.env.MEDIA_PORT ? process.env.MEDIA_PORT : 7666) + "/" + streamPath);
-    debugger;
 };
 exports.default = rtmpToHLS;

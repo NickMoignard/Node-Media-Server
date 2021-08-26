@@ -51,6 +51,7 @@ var NodeMediaServer = /** @class */ (function () {
             else {
                 this.nts = new NodeTransServer(this.config);
                 this.nts.run();
+                debugger;
                 this.nts.on('ffdata', function (_data) {
                     Logger.log('ffData');
                 });

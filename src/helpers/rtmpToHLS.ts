@@ -77,16 +77,21 @@ const rtmpToHLS = (streamPath: string) => {
     master_playlist += `#EXT-X-STREAM-INF:BANDWIDTH=${bandwidth},RESOLUTION=${r.res}\n${name}.m3u8` + "\n"
   })
 
+  const argArray = `${misc_params} -i ${source} ${cmd}`.split(' ')
+
   // # start conversion
   console.log(`Executing command:\nffmpeg ${misc_params} -i ${source} ${cmd}`)
-  const childProcess = cp.spawn(`${ffmpeg} ${misc_params} -i ${source} ${cmd}`, (e, stdout, stderr) => {
-    if (e) {
-      console.error(`ffmpeg exec error: ${e}`)
-      return
-    }
-    console.log(`stdout: ${stdout}`)
-    console.error(`stderr: ${stderr}`)
-  })
+  const childProcess = cp.spawn(ffmpeg, argArray)
+  
+  // (e, stdout, stderr) => {
+  //   if (e) {
+  //     console.error(`ffmpeg exec error: ${e}`)
+  //     return
+  //   }
+  //   console.log(`stdout: ${stdout}`)
+  //   console.error(`stderr: ${stderr}`)
+  // }
+
   childProcess.stdout.on('data', (data) => {
     console.log(data)
   })
@@ -95,7 +100,6 @@ const rtmpToHLS = (streamPath: string) => {
 
   // echo "Done - encoded HLS is at ${target}/"
   console.log(`Done - encoded HLS is at http://localhost:${process.env.MEDIA_PORT ? process.env.MEDIA_PORT : 7666}/${streamPath}`)
-  debugger
 }
 
 export default rtmpToHLS

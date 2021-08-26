@@ -53,15 +53,15 @@ const config = {
 }
 
 const server = new NodeMediaServer(config)
-server.on('postPublish', (id: string, streamPath: string, args: any) => {
-  console.log('===================== postPublish', id, streamPath, args)
-  const process = () => {
-    rtmpToHLS(streamPath)
-  }
-  setTimeout(process, 2000)
-})
-server.on('donePublish', (id: string, streamPath: string, args: any) => {
-  console.log('===================== donePublish', id, streamPath, args)
-})
+// server.on('postPublish', (id: string, streamPath: string, args: any) => {
+//   console.log('===================== postPublish', id, streamPath, args)
+//   const process = () => {
+//     rtmpToHLS(streamPath)
+//   }
+//   setTimeout(process, 2000)
+// })
+// server.on('donePublish', (id: string, streamPath: string, args: any) => {
+//   console.log('===================== donePublish', id, streamPath, args)
+// })
 
 server.run()

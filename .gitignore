@@ -33,6 +33,8 @@ node_modules
 
 .vscode
 
+dist
+
 # temporary data
 oldtsconfig.json
 src/public/static/js/runtime~main.c5541365.d.ts
