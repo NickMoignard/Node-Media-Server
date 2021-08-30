@@ -1,7 +1,7 @@
 /// <reference types="node" />
-import WebSocket from "ws";
-import { StreamConf } from "./types";
-import BaseWebSocketSession from "./base_node_websocket_server";
+import WebSocket from 'ws';
+import { StreamConf } from './types';
+import BaseWebSocketSession from './base_node_websocket_server';
 /**
  * Event emitting websocket stream session
  * @extends BaseWebSocketSession

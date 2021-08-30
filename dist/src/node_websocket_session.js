@@ -18,12 +18,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/* eslint-disable no-unused-expressions */
+var fs_1 = __importDefault(require("fs"));
+var mkdirp_1 = __importDefault(require("mkdirp"));
+// import ArgvArray from "./helpers/classes/ArgvArray"F
 var node_core_logger_1 = __importDefault(require("./node_core_logger"));
 var enums_1 = require("./types/enums");
 var base_node_websocket_server_1 = __importDefault(require("./base_node_websocket_server"));
-var fs_1 = __importDefault(require("fs"));
 var wsToHlsFfmpegConf_1 = require("./helpers/classes/wsToHlsFfmpegConf");
-var mkdirp_1 = __importDefault(require("mkdirp"));
 /**
  * Event emitting websocket stream session
  * @extends BaseWebSocketSession
@@ -50,15 +52,19 @@ var WebSocketSession = /** @class */ (function (_super) {
             node_core_logger_1.default.error("Node Media Stream Server startup failed. MediaRoot:" + this.conf.mediaroot + "/" + this.conf.streamName + " cannot be written.");
             return;
         }
-        this.conf.streamPath && _super.prototype.run.call(this, this.conf.ffmpeg, this.argv, this.conf.streamPath);
+        this.conf.streamPath &&
+            _super.prototype.run.call(this, this.conf.ffmpeg, this.argv, this.conf.streamPath);
         node_core_logger_1.default.log('Web Socket Session Started');
     };
     WebSocketSession.prototype.pauseSession = function () {
+        var temp = this.conf;
     };
     WebSocketSession.prototype.unpauseSession = function () {
+        var temp = this.conf;
     };
     WebSocketSession.prototype.resetSession = function () {
         // look for files and delete / copy them
+        var temp = this.conf;
     };
     // Extend Web Socket Callbacks
     WebSocketSession.prototype.websocketMessageEventHandler = function (data, isBinary) {
@@ -102,11 +108,13 @@ var WebSocketSession = /** @class */ (function (_super) {
     // }
     WebSocketSession.prototype.addWebSocketEventListners = function () {
         // EVENT LISTENERS
-        this.websocketClosedEventHandler = this.websocketClosedEventHandler.bind(this);
+        this.websocketClosedEventHandler =
+            this.websocketClosedEventHandler.bind(this);
         this.ws.on('close', this.websocketClosedEventHandler);
         this.websocketErrorEventHandler = this.websocketErrorEventHandler.bind(this);
         this.ws.on('error', this.websocketErrorEventHandler);
-        this.websocketMessageEventHandler = this.websocketMessageEventHandler.bind(this);
+        this.websocketMessageEventHandler =
+            this.websocketMessageEventHandler.bind(this);
         this.ws.on('message', this.websocketMessageEventHandler);
         this.websocketOpenEventHandler = this.websocketOpenEventHandler.bind(this);
         this.ws.on('open', this.websocketOpenEventHandler);
@@ -114,9 +122,11 @@ var WebSocketSession = /** @class */ (function (_super) {
         this.ws.on('ping', this.websocketPingEventHandler);
         this.websocketPongEventHandler = this.websocketPongEventHandler.bind(this);
         this.ws.on('pong', this.websocketPongEventHandler);
-        this.websocketUnExpResEventHandler = this.websocketUnExpResEventHandler.bind(this);
+        this.websocketUnExpResEventHandler =
+            this.websocketUnExpResEventHandler.bind(this);
         this.ws.on('unexpected-response', this.websocketUnExpResEventHandler);
-        this.websocketUpgradeEventHandler = this.websocketUpgradeEventHandler.bind(this);
+        this.websocketUpgradeEventHandler =
+            this.websocketUpgradeEventHandler.bind(this);
         this.ws.on('upgrade', this.websocketUpgradeEventHandler);
     };
     return WebSocketSession;

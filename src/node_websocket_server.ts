@@ -12,8 +12,9 @@ import url from "url"
 import http from "http"
 import { NodeMediaServerConfig, StreamConf } from "./types";
 import { HLS_CODES } from "./types/enums"
-import { LoggingEnabled } from "@aws-sdk/client-s3"
+
 import WebSocketRTMPSession from "./node_websocket_rtmp_session"
+
 const context = require('./node_core_ctx')
 /**
  * Event emitting websocket stream server
