@@ -18,6 +18,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/* eslint-disable no-debugger */
+/* eslint-disable camelcase */
+/* eslint-disable import/no-named-as-default-member */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-unused-vars */
+/* eslint-disable class-methods-use-this */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable no-unused-expressions */
 var child_process_1 = require("child_process");
 var events_1 = __importDefault(require("events"));
 var node_core_logger_1 = __importDefault(require("./node_core_logger"));
@@ -39,7 +47,8 @@ var FfmpegProcess = /** @class */ (function (_super) {
         this.ffmpegCloseEventHandler = this.ffmpegCloseEventHandler.bind(this);
         this.ffmpegDataEventHandler = this.ffmpegDataEventHandler.bind(this);
         this.ffmpegErrorEventHandler = this.ffmpegErrorEventHandler.bind(this);
-        this.ffmpegSTDOUTErrorEventHandler = this.ffmpegSTDOUTErrorEventHandler.bind(this);
+        this.ffmpegSTDOUTErrorEventHandler =
+            this.ffmpegSTDOUTErrorEventHandler.bind(this);
         if (this.ffmpeg_exec) {
             this.ffmpeg_exec.stdout &&
                 this.ffmpeg_exec.stdout.on('data', this.ffmpegDataEventHandler);
@@ -53,7 +62,7 @@ var FfmpegProcess = /** @class */ (function (_super) {
         node_core_logger_1.default.ffdebug(e);
     };
     FfmpegProcess.prototype.ffmpegCloseEventHandler = function (_code, _signal) {
-        node_core_logger_1.default.log('[Transmuxing end] ' + this.path);
+        node_core_logger_1.default.log("[Transmuxing end] " + this.path);
         this.emit('end', this.id);
     };
     FfmpegProcess.prototype.ffmpegSTDOUTErrorEventHandler = function (error) {

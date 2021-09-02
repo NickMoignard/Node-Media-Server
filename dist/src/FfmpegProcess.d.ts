@@ -1,6 +1,6 @@
 /// <reference types="node" />
-import { ChildProcess } from "child_process";
-import EventEmitter from "events";
+import { ChildProcess } from 'child_process';
+import EventEmitter from 'events';
 declare class FfmpegProcess extends EventEmitter {
     ffmpeg_exec?: ChildProcess;
     path?: string;

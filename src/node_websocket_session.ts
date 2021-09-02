@@ -22,7 +22,7 @@ class WebSocketSession extends BaseWebSocketSession {
     super(id, ws)
     Logger.log('WebSocketSession constructor')
     this.conf = conf
-    this.argv = new WSHevcConfig(this.conf.streamPath).args()
+    this.argv = new WSHevcConfig(this.conf.streamPath).args(conf.mediaroot)
     this.addWebSocketEventListners()
   }
 
@@ -42,7 +42,7 @@ class WebSocketSession extends BaseWebSocketSession {
       )
     } catch (error) {
       Logger.error(
-        `Node Media Stream Server startup failed. MediaRoot:${this.conf.mediaroot}/${this.conf.streamName} cannot be written.`
+        `MediaRoot:${this.conf.mediaroot}/${this.conf.streamName} cannot be written.`
       )
       return
     }

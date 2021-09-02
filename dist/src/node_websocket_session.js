@@ -36,7 +36,7 @@ var WebSocketSession = /** @class */ (function (_super) {
         var _this = _super.call(this, id, ws) || this;
         node_core_logger_1.default.log('WebSocketSession constructor');
         _this.conf = conf;
-        _this.argv = new wsToHlsFfmpegConf_1.WSHevcConfig(_this.conf.streamPath).args();
+        _this.argv = new wsToHlsFfmpegConf_1.WSHevcConfig(_this.conf.streamPath).args(conf.mediaroot);
         _this.addWebSocketEventListners();
         return _this;
     }
@@ -49,7 +49,7 @@ var WebSocketSession = /** @class */ (function (_super) {
             node_core_logger_1.default.log(this.conf.mediaroot + "/" + this.conf.streamApp + "/" + this.conf.streamName);
         }
         catch (error) {
-            node_core_logger_1.default.error("Node Media Stream Server startup failed. MediaRoot:" + this.conf.mediaroot + "/" + this.conf.streamName + " cannot be written.");
+            node_core_logger_1.default.error("MediaRoot:" + this.conf.mediaroot + "/" + this.conf.streamName + " cannot be written.");
             return;
         }
         this.conf.streamPath &&
